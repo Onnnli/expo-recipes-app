@@ -1,0 +1,20 @@
+node_modules/
+.expo/
+.expo-shared/
+.vscode/
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+babel.config.js
+*.bat
+web-build/
+assets/app_icons/
+.github/workflows/
+
+# macOS
+.DS_Store
