@@ -1,24 +1,46 @@
-import React from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useContext, useEffect } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Icon } from 'react-native-elements';
 import FoodCategoryCard from '../components/FoodCategoryCard';
-import foodCategory from '../assets/FoodsDB/foodCategories';
 import globalStyles from '../assets/styles/globalStyles';
+import AppContext from '../assets/globals/appContext';
 
-export default function Categories({ navigation, route }) {
+export default function Categories({ navigation }) {
+  const context = useContext(AppContext);
+
+  useEffect(() => {
+    (async function () {
+      await context.getAllCategories();
+    })();
+  }, []);
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity
           style={{
             padding: 6,
-            backgroundColor: '#2221',
+            backgroundColor: '#FEA11F',
             borderRadius: 100,
+            flexDirection: 'row',
+            alignItems: 'center',
           }}
           activeOpacity={0.6}
-          onPress={() => navigation.navigate(`SearchStack`)}
+          onPress={() => navigation.push(`AddRecipe`)}
         >
-          <Icon type="material-icons" name="search" color="#222" />
+          <View
+            style={{
+              padding: 1,
+              backgroundColor: '#FEA11F',
+              borderRadius: 100,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: '#fff' }}>Добавить</Text>
+            <Text style={{ color: '#fff' }}>рецепт</Text>
+          </View>
+
+          <Icon type="material-icons" name="add-circle" color="#fff" />
         </TouchableOpacity>
       ),
     });
@@ -27,24 +49,13 @@ export default function Categories({ navigation, route }) {
   return (
     <ScrollView style={globalStyles.screen}>
       <View style={styles.categoryContainer}>
-        <View
-          style={{
-            height: 12,
-          }}
-        />
-        {foodCategory.map((item, index) => {
-          if (item.name === 'Default') {
-            return null;
-          }
-          return (
-            <FoodCategoryCard key={index} navigation={navigation} route={route} category={item} />
-          );
-        })}
-        <View
-          style={{
-            height: 8,
-          }}
-        />
+        {context.categories.map((category) => (
+          <FoodCategoryCard
+            key={category.id_category}
+            navigation={navigation}
+            category={category}
+          />
+        ))}
       </View>
     </ScrollView>
   );

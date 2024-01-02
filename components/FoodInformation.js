@@ -13,6 +13,7 @@ import window from '../assets/controller/window';
 
 export default function FoodInformation({ information }) {
   const [visible, isVisible] = useState(false);
+
   return (
     <View style={styles.informationWrapper}>
       <TouchableOpacity
@@ -45,7 +46,7 @@ export default function FoodInformation({ information }) {
                   </Pressable>
                 </View>
               </View>
-              <ScrollView style={styles.descriptionCOntainer}>
+              <ScrollView style={styles.descriptionContainer}>
                 <Text style={styles.title}>{information.title}</Text>
                 <View style={styles.divider} />
                 <Text style={styles.content}>{information.content}</Text>
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     padding: 4,
   },
-  descriptionCOntainer: {
+  descriptionContainer: {
     paddingHorizontal: 12,
     paddingVertical: 8,
   },

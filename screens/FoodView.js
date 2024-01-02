@@ -1,107 +1,61 @@
-import React, { useState } from 'react';
-import { Linking, StyleSheet, Image, Text, View, ScrollView } from 'react-native';
-import { Icon } from 'react-native-elements';
+import React, { useLayoutEffect } from 'react';
+import { StyleSheet, Image, Text, View, ScrollView } from 'react-native';
+
 import globalStyles from '../assets/styles/globalStyles';
 import window from '../assets/controller/window';
 import FoodViewType from '../components/FoodViewType';
 import FoodRecipe from '../components/FoodRecipe';
 import FavoriteButton from '../components/FavoriteButton';
-import FoodInformation from '../components/FoodInformation';
-
-function compareStrings(a, b) {
-  a = a.toLowerCase();
-  b = b.toLowerCase();
-
-  return a < b ? -1 : a > b ? 1 : 0;
-}
+import baseUrl from '../constants/baseUrl';
 
 export default function FoodView({ navigation, route }) {
-  const [food, setFood] = useState(route.params);
-  const [foodType, setFoodType] = useState(food.type);
+  const { recipe, categories } = route.params;
 
-  React.useLayoutEffect(() => {
+  // Lol
+  const viewRecipe = recipe.Recipe || recipe;
+
+  useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle: food.name,
+      headerTitle: viewRecipe.name,
     });
-  }, [navigation, food]);
-
-  foodType.sort(function (a, b) {
-    return compareStrings(a, b);
-  });
+  }, [navigation, recipe]);
 
   return (
     <ScrollView style={globalStyles.screen}>
       <View>
-        <Image source={food.image} style={styles.image} />
+        <Image source={{ uri: `${baseUrl}/${viewRecipe.image}` }} style={styles.image} />
         <View style={styles.favoriteButtonContainer}>
-          <FavoriteButton id={food.id} />
+          <FavoriteButton id={viewRecipe.id_recipe} />
         </View>
       </View>
+
       <View style={styles.articleContainer}>
         <View style={styles.article}>
           <View style={styles.foodHeaderContainer}>
             <View style={styles.foodNameContainer}>
-              <Text style={styles.foodName}>{food.name}</Text>
-              <Text style={styles.foodTagalog}>({food.tagalog})</Text>
+              <Text style={styles.foodName}>{viewRecipe.name}</Text>
             </View>
           </View>
-          <View style={styles.divider} />
-          <View style={styles.foodDescriptionContainer}>
-            <Text style={styles.foodDescription}>{food.description}</Text>
-            {food.information && (
-              <View style={styles.foodInformationWrapper}>
-                {food.information.map((information, index) => {
-                  return <FoodInformation key={index} information={information} />;
-                })}
-              </View>
-            )}
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.foodSocials}>
-            <View style={styles.foodSocialLogo}>
-              <Icon
-                size={24}
-                color="#444"
-                type="material-icons"
-                name="public"
-                onPress={() => Linking.openURL(food.link)}
-              />
-            </View>
-            {food.video && (
-              <View style={styles.foodSocialLogo}>
-                <Icon
-                  size={24}
-                  color="#444"
-                  type="ionicon"
-                  name="logo-youtube"
-                  onPress={() => Linking.openURL(food.video)}
-                />
-              </View>
-            )}
-          </View>
-          <Text style={styles.foodAuthor}>Recipe By: {food.author}</Text>
-          <View style={styles.divider} />
+          <Text style={styles.foodAuthor}>
+            Recipe By: {viewRecipe.User.name} {viewRecipe.User.last_name}
+          </Text>
+
           <ScrollView
             horizontal
             style={styles.foodTypesContainer}
             showsHorizontalScrollIndicator={false}
           >
-            <View
-              style={{
-                width: 16,
-              }}
-            />
-            {foodType.map((type, index) => (
-              <FoodViewType key={index} navigation={navigation} route={route} foodType={type} />
+            {categories.map((category) => (
+              <FoodViewType
+                key={category.Categorie.id_category}
+                navigation={navigation}
+                route={route}
+                foodType={category}
+              />
             ))}
-            <View
-              style={{
-                width: 16,
-              }}
-            />
           </ScrollView>
-          <View style={styles.divider} />
-          <FoodRecipe recipe={food.recipe} />
+
+          <FoodRecipe recipe={viewRecipe} />
         </View>
       </View>
     </ScrollView>

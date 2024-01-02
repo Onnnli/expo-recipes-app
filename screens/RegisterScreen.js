@@ -48,7 +48,7 @@ function RegisterScreen({ navigation }) {
             marginBottom: 30,
           }}
         >
-          Register
+          Регистрация
         </Text>
 
         <InputField

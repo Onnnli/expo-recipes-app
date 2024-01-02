@@ -37,26 +37,17 @@ export default function Profile({ navigation }) {
         </Text>
       </View>
 
-      <View style={styles.statsContainer}>
-        <View style={styles.statsBox}>
-          <Text style={[styles.text, { fontSize: 24 }]}>483</Text>
-          <Text style={[styles.text, styles.subText]}>Рецептов</Text>
-        </View>
-
-        <View
-          style={[
-            styles.statsBox,
-            { borderColor: '#DFD8C8', borderLeftWidth: 1, borderRightWidth: 1 },
-          ]}
+      <View style={styles.settingsContainer}>
+        <TouchableOpacity
+          activeOpacity={0.75}
+          style={styles.settingContainer}
+          onPress={() => navigation.push('MyRecipes')}
         >
-          <Text style={[styles.text, { fontSize: 24 }]}>45,844</Text>
-          <Text style={[styles.text, styles.subText]}>Followers</Text>
-        </View>
-
-        <View style={styles.statsBox}>
-          <Text style={[styles.text, { fontSize: 24 }]}>302</Text>
-          <Text style={[styles.text, styles.subText]}>Following</Text>
-        </View>
+          <View style={styles.settingIconContainer}>
+            <Icon type="material-icons" name="lunch-dining" color="#020202" />
+          </View>
+          <Text style={[styles.settingLabel, { color: '#020202' }]}>Мои рецепты</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.settingsContainer}>
@@ -86,6 +77,7 @@ export default function Profile({ navigation }) {
       </View>
 
       <CustomButton label="Выйти" onPress={onLogout} />
+
       <View
         style={{
           flexDirection: 'row',
@@ -97,6 +89,7 @@ export default function Profile({ navigation }) {
           <Text style={{ color: '#FAAF3E', fontWeight: '700' }}>Удалить аккаунт</Text>
         </TouchableOpacity>
       </View>
+
       <ClearFavouritesModal
         clearFavoritesModal={clearFavoritesModal}
         onRequestClose={onToggleModal}

@@ -1,60 +1,53 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, FlatList, Animated, Text, View } from 'react-native';
 import { ExpandingDot } from 'react-native-animated-pagination-dots';
-import { foodIngredient } from '../assets/controller/query';
 import window from '../assets/controller/window';
 import tableStyles from '../assets/styles/tableStyles';
 import FoodIngredient from './FoodIngredient';
-import FoodRecipeDetails from './FoodRecipeDetails';
-
-function compareStrings(a, b) {
-  a = a.toLowerCase();
-  b = b.toLowerCase();
-
-  return a < b ? -1 : a > b ? 1 : 0;
-}
+import { useRecipes } from '../hooks/useRecipes';
 
 export default function FoodRecipe({ recipe }) {
+  const { getNutritionByRecipe, getIngredients } = useRecipes();
+
+  const [nutrition, setNutrition] = useState({});
   const [ingredients, setIngredients] = useState([]);
 
   useEffect(() => {
-    foodIngredient(recipe.ingredients)
-      .then((data) => {
-        setIngredients(data);
-      })
-      .catch((error) => {
-        alert(error);
-      });
-  }, [recipe]);
+    (async function () {
+      const nutritionData = await getNutritionByRecipe(recipe.id_recipe);
+      const ingredientsData = await getIngredients(recipe.id_recipe);
+
+      setNutrition(nutritionData);
+      setIngredients(ingredientsData);
+    })();
+  }, [getIngredients, getNutritionByRecipe, recipe]);
 
   const scrollX = React.useRef(new Animated.Value(0)).current;
 
+  const instructions = useMemo(() => recipe.description.split('. '), [recipe]);
+
   return (
     <View style={styles.recipeContainer}>
-      <FoodRecipeDetails style={styles.recipeBranchContainer} details={recipe.details} />
-      <View style={styles.divider} />
       <View style={styles.ingredientsContainer}>
-        <Text style={styles.ingredientsLabel}>Ingredients</Text>
+        <Text style={styles.ingredientsLabel}>Ингредиенты</Text>
         <View>
-          {recipe.ingredients.map((ingredient, index) => {
-            return (
-              <FoodIngredient
-                key={index}
-                ingredient={ingredient}
-                ingredientImage={ingredients[index]}
-                index={index}
-              />
-            );
-          })}
+          {ingredients.map((ingredient, index) => (
+            <FoodIngredient
+              sortId={index + 1}
+              key={ingredient.id_ingredient_recipe}
+              ingredient={ingredient}
+            />
+          ))}
         </View>
       </View>
+
       <View style={styles.divider} />
       <View style={styles.instructionsContainer}>
-        <Text style={styles.instructionsLabel}>Instructions</Text>
+        <Text style={styles.instructionsLabel}>Шаги прилотовления</Text>
         <FlatList
           contentContainerStyle={{ flexGrow: 1 }}
           horizontal
-          data={recipe.instructions}
+          data={instructions}
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
@@ -62,20 +55,10 @@ export default function FoodRecipe({ recipe }) {
           })}
           decelerationRate="normal"
           scrollEventThrottle={16}
-          // ListHeaderComponent={
-          //   <View style={{
-          //     width: 4,
-          //   }}></View>
-          // }
-          // ListFooterComponent={
-          //   <View style={{
-          //     width: 4,
-          //   }}></View>
-          // }
           renderItem={({ item, index }) => (
             <View style={styles.instructionWrapper}>
               <View style={styles.instructionContainer}>
-                <Text style={styles.instructionNumberContainer}>Step {index + 1}</Text>
+                <Text style={styles.instructionNumberContainer}>Шаг {index + 1}</Text>
                 <View style={styles.instruction}>
                   <Text style={styles.instructionText}>{item}</Text>
                 </View>
@@ -84,7 +67,7 @@ export default function FoodRecipe({ recipe }) {
           )}
         />
         <ExpandingDot
-          data={recipe.instructions}
+          data={instructions}
           scrollX={scrollX}
           inActiveDotOpacity={0.2}
           activeDotColor="#36C464"
@@ -111,24 +94,75 @@ export default function FoodRecipe({ recipe }) {
         />
       </View>
       <View style={styles.divider} />
-      {recipe.nutrition != null ? (
-        <View>
-          <View style={styles.nutritionContainer}>
-            <View style={[styles.nutritionWrapper, tableStyles.container, tableStyles.border]}>
-              <Text style={tableStyles.title}>Nutrition</Text>
-              {recipe.nutrition.map((nutri, index) => {
-                return (
-                  <View key={index} style={tableStyles.twoColumns}>
-                    <Text style={tableStyles.leftColumn}>{nutri.name}</Text>
-                    <Text style={tableStyles.rightColumn}>{nutri.amount}</Text>
-                  </View>
-                );
-              })}
+
+      <View>
+        <View style={styles.nutritionContainer}>
+          <View style={[styles.nutritionWrapper, tableStyles.container, tableStyles.border]}>
+            <Text style={tableStyles.title}>КБЖУ и витамины</Text>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>Калории</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.calories}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>Белки</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.protein}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>Жиры</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.fat}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>Углеводы</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.carbohydrates}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>Холестерин</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.cholesterol}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>клетчатка</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.fiber}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>Железо</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.iron}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>калий</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.potassium}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>насыщенные жиры</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.saturatedFat}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>натрий</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.sodium}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>кальций</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.calcium}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>Сахар</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.sugar}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>Витамин А</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.vitaminA}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>Витамин С</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.vitaminC}</Text>
+            </View>
+            <View style={tableStyles.twoColumns}>
+              <Text style={tableStyles.leftColumn}>питательных веществ</Text>
+              <Text style={tableStyles.rightColumn}>{nutrition.serving}</Text>
             </View>
           </View>
-          <View style={styles.divider} />
         </View>
-      ) : null}
+        <View style={styles.divider} />
+      </View>
     </View>
   );
 }

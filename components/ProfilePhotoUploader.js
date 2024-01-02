@@ -9,6 +9,8 @@ import baseURL from '../constants/baseUrl';
 function ProfilePhotoUploader({ profile }) {
   const context = useContext(AppContext);
 
+  console.log(context.user, ' context.user');
+
   const createFormData = (photo) => {
     const data = new FormData();
 
@@ -22,7 +24,7 @@ function ProfilePhotoUploader({ profile }) {
   };
 
   const [photo, setPhoto] = React.useState(
-    context.user.image ? `${baseURL}/${context.user.image}` : null
+    context?.user?.image ? `${baseURL}/${context.user.image}` : null
   );
 
   const upload = useCallback(

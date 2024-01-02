@@ -19,6 +19,8 @@ function ProfileEditScreen({ navigation }) {
   const onPress = useCallback(async () => {
     await context.onEdit({ name, lastName, email, password }, context.user.id_user);
 
+    alert('Сохранено!');
+
     navigation.navigate('Profile');
   }, [context, email, lastName, name, navigation, password]);
 

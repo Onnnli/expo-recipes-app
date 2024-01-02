@@ -27,6 +27,7 @@ function SearchStack() {
       >
         {(props) => <Search {...props} />}
       </Stack.Screen>
+
       <Stack.Screen
         name="FoodView"
         options={({ navigation, route }) => ({
@@ -36,15 +37,15 @@ function SearchStack() {
       >
         {(props) => <FoodView {...props} />}
       </Stack.Screen>
-      <Stack.Screen
-        name="FoodCategory"
-        options={({ navigation, route }) => ({
-          title: 'Food Category',
-          animation: 'slide_from_right',
-        })}
-      >
-        {(props) => <FoodCategory {...props} />}
-      </Stack.Screen>
+      {/* <Stack.Screen */}
+      {/*  name="FoodCategory" */}
+      {/*  options={({ navigation, route }) => ({ */}
+      {/*    title: 'Food Category', */}
+      {/*    animation: 'slide_from_right', */}
+      {/*  })} */}
+      {/* > */}
+      {/*  {(props) => <FoodCategory {...props} />} */}
+      {/* </Stack.Screen> */}
     </Stack.Navigator>
   );
 }

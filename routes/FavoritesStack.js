@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Favorites from '../screens/Favorites';
 import FoodView from '../screens/FoodView';
 import FoodCategory from '../screens/FoodCategory';
+import ShopList from '../screens/ShopList';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,15 +23,25 @@ function FavoritesStack() {
       <Stack.Screen
         name="Favorites"
         options={({ navigation, route }) => ({
-          title: 'Favorites',
+          title: 'Любимые рецепты',
         })}
       >
         {(props) => <Favorites {...props} />}
       </Stack.Screen>
+
+      <Stack.Screen
+        name="ShopList"
+        options={({ navigation, route }) => ({
+          title: 'Список покупок',
+        })}
+      >
+        {(props) => <ShopList {...props} />}
+      </Stack.Screen>
+
       <Stack.Screen
         name="FoodView"
         options={({ navigation, route }) => ({
-          title: 'Food View',
+          title: 'Рецепты',
           animation: 'slide_from_bottom',
         })}
       >
@@ -39,7 +50,7 @@ function FavoritesStack() {
       <Stack.Screen
         name="FoodCategory"
         options={({ navigation, route }) => ({
-          title: 'Food Category',
+          title: 'Рецепты по категориям',
           animation: 'slide_from_right',
         })}
       >

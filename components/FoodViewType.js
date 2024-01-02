@@ -1,32 +1,20 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { TouchableOpacity, StyleSheet, Text, View } from 'react-native';
-import foodCategory from '../assets/FoodsDB/foodCategories';
 
-export default function FoodViewType({ navigation, route, foodType }) {
-  const category = useMemo(() => {
-    for (let i = 0; i <= foodCategory.length; i++) {
-      if (i === foodCategory.length) return foodCategory[0];
-      if (foodCategory[i].name === foodType) {
-        return foodCategory[i];
-      }
-    }
-  }, [foodType]);
-
+export default function FoodViewType({ navigation, foodType }) {
   return (
     <View style={styles.typeWrapper}>
       <TouchableOpacity
         activeOpacity={0.6}
-        style={[
-          styles.typeContainer,
-          {
-            backgroundColor: category.color != null ? category.color : '#FEA11F',
-          },
-        ]}
+        style={styles.typeContainer}
         onPress={() => {
-          navigation.push('FoodCategory', foodType);
+          navigation.push('FoodCategory', {
+            name: foodType.Categorie.name,
+            id: foodType.Categorie.id_category,
+          });
         }}
       >
-        <Text style={styles.typeText}>{foodType}</Text>
+        <Text style={styles.typeText}>{foodType.Categorie.name.toLowerCase()}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -38,7 +26,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   typeContainer: {
-    backgroundColor: '#222',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 100,
@@ -46,6 +33,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#FEA11F',
   },
   typeText: {
     color: '#fff',

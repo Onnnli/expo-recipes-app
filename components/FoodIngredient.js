@@ -1,77 +1,40 @@
 import React from 'react';
 import { StyleSheet, Image, Text, View } from 'react-native';
 import tableStyles from '../assets/styles/tableStyles';
+import baseUrl from '../constants/baseUrl';
 
-export default function FoodIngredient({ ingredient, ingredientImage, index }) {
+export default function FoodIngredient({ ingredient, sortId }) {
   return (
     <View style={styles.ingredientContainer}>
       <View style={styles.ingredientNumberContainer}>
-        <Text style={styles.ingredientNumber}>{index + 1}</Text>
+        <Text style={styles.ingredientNumber}>{sortId}</Text>
       </View>
       <View style={styles.ingredientImageContainer}>
-        {ingredientImage != null ? (
-          <View
-            style={{
-              height: '100%',
-              aspectRatio: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Image style={styles.ingredientImage} source={ingredientImage.image} />
-          </View>
-        ) : (
-          <View
-            style={{
-              height: '100%',
-              aspectRatio: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Image
-              style={[styles.ingredientImage, { height: '80%' }]}
-              source={require('../assets/images/no-image.png')}
-            />
-            <Text
-              style={{
-                fontSize: 12,
-                width: '100%',
-                textAlign: 'center',
-              }}
-            >
-              {ingredient.image}
-            </Text>
-          </View>
-        )}
+        <View
+          style={{
+            height: '100%',
+            aspectRatio: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Image
+            style={styles.ingredientImage}
+            source={{ uri: `${baseUrl}/public/images/${ingredient.Ingredient.slug}.png` }}
+          />
+        </View>
       </View>
       <View style={styles.ingredientDetails}>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#222' }}>{ingredient.name}</Text>
-        {ingredient.tagalog != null ? (
-          <View>
-            <Text style={{ fontSize: 12, marginTop: -4, color: '#444', fontStyle: 'italic' }}>
-              {ingredient.tagalog}
-            </Text>
+        <View style={[tableStyles.container, tableStyles.border, { marginTop: 8, width: '100%' }]}>
+          <View style={[styles.twoColumns, styles.rowDivider]}>
+            <Text style={styles.leftColumn}>Ингредиент</Text>
+            <Text style={styles.rightColumn}>{ingredient.Ingredient.name}</Text>
           </View>
-        ) : null}
-        {ingredient.type != null || ingredient.amount != null ? (
-          <View
-            style={[tableStyles.container, tableStyles.border, { marginTop: 8, width: '100%' }]}
-          >
-            {ingredient.type != null ? (
-              <View style={[styles.twoColumns, styles.rowDivider]}>
-                <Text style={styles.leftColumn}>Type</Text>
-                <Text style={styles.rightColumn}>{ingredient.type}</Text>
-              </View>
-            ) : null}
-            {ingredient.amount != null ? (
-              <View style={styles.twoColumns}>
-                <Text style={styles.leftColumn}>Amount</Text>
-                <Text style={styles.rightColumn}>{ingredient.amount}</Text>
-              </View>
-            ) : null}
+          <View style={styles.twoColumns}>
+            <Text style={styles.leftColumn}>Количество</Text>
+            <Text style={styles.rightColumn}>{ingredient.amount}</Text>
           </View>
-        ) : null}
+        </View>
       </View>
     </View>
   );

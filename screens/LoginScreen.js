@@ -58,7 +58,7 @@ function LoginScreen({ navigation }) {
             marginBottom: 30,
           }}
         >
-          Email
+          Авторизоваться
         </Text>
 
         <InputField

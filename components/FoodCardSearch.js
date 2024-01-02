@@ -1,30 +1,24 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, TouchableOpacity, Text, View } from 'react-native';
-
+import { Icon } from 'react-native-elements';
 import FavoriteButton from './FavoriteButton';
 import baseUrl from '../constants/baseUrl';
 import { useRecipes } from '../hooks/useRecipes';
+import DeleteRecipeModal from './DeleteRecipeModal';
 
-export default function FoodCard({ navigation, recipe }) {
+export default function FoodCardSearch({ navigation, recipe, profile }) {
   const { getCategoriesByRecipe } = useRecipes();
 
   const [categories, setCategories] = useState([]);
-  const recipeData = useMemo(() => recipe?.Recipe || recipe, [recipe]);
-
-  // console.log(recipeData, 'recipeData');
+  const [deleteRecipeModal, setDeleteRecipeModal] = useState(false);
 
   useEffect(() => {
     (async function () {
-      if (recipeData) {
-        const categoriesData = await getCategoriesByRecipe(recipeData?.id_recipe);
-        setCategories(categoriesData);
-      }
-    })();
-  }, [getCategoriesByRecipe, recipeData]);
+      const categoriesData = await getCategoriesByRecipe(recipe.id_recipe);
 
-  if (!recipe) {
-    return null;
-  }
+      setCategories(categoriesData);
+    })();
+  }, [getCategoriesByRecipe, recipe]);
 
   return (
     <View style={styles.cardWrapper}>
@@ -36,27 +30,53 @@ export default function FoodCard({ navigation, recipe }) {
         }}
       >
         <View style={styles.cardImageContainer}>
-          <Image style={styles.cardImage} source={{ uri: `${baseUrl}/${recipeData.image}` }} />
+          <Image style={styles.cardImage} source={{ uri: `${baseUrl}/${recipe.image}` }} />
         </View>
+
         <View style={[styles.cardFoodColor]} />
+
         <View style={styles.cardDetailsContainer}>
-          <Text style={{ color: '#333', fontWeight: 'bold', fontSize: 16 }}>{recipeData.name}</Text>
+          <Text style={{ color: '#333', fontWeight: 'bold', fontSize: 16 }}>{recipe.name}</Text>
           <View style={styles.foodTypeContainer}>
             {categories.length > 0 && (
               <View style={styles.foodType}>
                 <Text style={styles.foodTypeLabel}>{categories[0].Categorie.name}</Text>
               </View>
             )}
-
             {categories.length > 1 ? (
               <Text style={styles.foodTypesLabel}>+{categories.length - 1}</Text>
             ) : null}
           </View>
         </View>
-        <View style={styles.favButtonContainer}>
-          <FavoriteButton id={recipeData.id_recipe} />
-        </View>
+
+        {profile ? (
+          <View>
+            <TouchableOpacity
+              style={[styles.favButtonContainer, { width: 50 }]}
+              onPress={() => navigation.push('MyRecipesEdit', { recipe, categories })}
+            >
+              <Icon type="material-icons" name="edit" color="#ccc" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.favButtonContainer, { width: 50 }]}
+              onPress={() => setDeleteRecipeModal(true)}
+            >
+              <Icon type="material-icons" name="delete" color="#F3B2B2FF" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.favButtonContainer}>
+            <FavoriteButton id={recipe.id_recipe} />
+          </View>
+        )}
       </TouchableOpacity>
+
+      <DeleteRecipeModal
+        recipe={recipe}
+        isOpen={deleteRecipeModal}
+        onRequestClose={() => setDeleteRecipeModal(false)}
+      />
     </View>
   );
 }

@@ -1,123 +1,103 @@
-import React, { useState } from 'react';
-import { Text, TextInput, StyleSheet, FlatList, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Text, TextInput, StyleSheet, FlatList, View, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
-import FoodCard from '../components/FoodCard';
+
 import window from '../assets/controller/window';
-import PinoyFoods from '../assets/FoodsDB/foodsDB';
 import globalStyles from '../assets/styles/globalStyles';
-
-function compareStrings(a, b) {
-  a = a.toLowerCase();
-  b = b.toLowerCase();
-
-  return a < b ? -1 : a > b ? 1 : 0;
-}
-
-function findMatches(wordToMatch, foods) {
-  return foods.filter((food) => {
-    const regex = new RegExp(wordToMatch, 'gi');
-    if (food.name.match(regex) || food.tagalog.match(regex)) return true;
-    if (matchType(wordToMatch, food.type)) return true;
-    if (matchSpecial(wordToMatch, food.special)) return true;
-    if (matchKeywords(wordToMatch, food.keywords)) return true;
-    return false;
-  });
-}
-
-function matchType(wordToMatch, type) {
-  const regex = new RegExp(wordToMatch, 'gi');
-  for (let i = 0; i < type.length; i++) {
-    if (type[i].match(regex)) {
-      return true;
-    }
-  }
-}
-
-function matchSpecial(wordToMatch, special) {
-  if (special == null) return false;
-  const regex = new RegExp(wordToMatch, 'gi');
-  for (let i = 0; i < special.length; i++) {
-    if (special[i].match(regex)) {
-      return true;
-    }
-  }
-}
-
-function matchKeywords(wordToMatch, keywords) {
-  if (keywords == null) return false;
-  const regex = new RegExp(wordToMatch, 'gi');
-  for (let i = 0; i < keywords.length; i++) {
-    if (keywords[i].match(regex)) {
-      return true;
-    }
-  }
-}
+import { useRecipes } from '../hooks/useRecipes';
+import FoodCardSearch from '../components/FoodCardSearch';
+import SearchModal from '../components/SearchModal';
 
 export default function Search({ navigation, route }) {
-  const [foods, setFoods] = useState(
-    PinoyFoods.sort((a, b) => {
-      return compareStrings(a.name, b.name);
-    })
-  );
-  const [searchText, setSearchText] = useState(null);
+  const { getAllRecipes, getAllIngredients } = useRecipes();
+  const [recipes, setRecipes] = useState([]);
+  const [searchRecipe, setSearchRecipe] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [ingredients, setIngredients] = useState([]);
 
-  const onChange = (string) => {
-    const word = string.replace(/[^a-zA-Z -]/g, '');
-    setSearchText(word);
-    if (word.length > 0) setFoods(findMatches(word, PinoyFoods));
-    else
-      setFoods(
-        PinoyFoods.sort((a, b) => {
-          return compareStrings(a.name, b.name);
-        })
-      );
-  };
+  const [openModal, setOpenModal] = useState(false);
+
+  useEffect(() => {
+    (async function () {
+      const allRecipes = await getAllRecipes();
+      const allIngredients = await getAllIngredients();
+      setRecipes(allRecipes);
+      setIngredients(allIngredients);
+      setSearchRecipe(allRecipes);
+    })();
+  }, []);
+
+  const onChange = useCallback(
+    (value) => {
+      setSearchText(value);
+
+      if (value.trim()) {
+        const filteredRecipe = recipes.filter((recipe) =>
+          recipe.name.toLowerCase().includes(value.toLowerCase())
+        );
+
+        setSearchRecipe(filteredRecipe);
+      } else {
+        setSearchRecipe(recipes);
+      }
+    },
+    [recipes]
+  );
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
-        <View style={styles.searchFieldContainer}>
-          <Icon
-            type="material-icons"
-            name="search"
-            color="#666"
+        <>
+          <View style={styles.searchFieldContainer}>
+            <Icon
+              type="material-icons"
+              name="search"
+              color="#666"
+              style={{ marginHorizontal: 12 }}
+            />
+            <TextInput
+              style={styles.searchField}
+              keyboardType="email-address"
+              placeholder="Поиск по названию..."
+              onChangeText={onChange}
+              value={searchText}
+            />
+          </View>
+          <TouchableOpacity
             style={{
-              marginHorizontal: 12,
+              marginLeft: 10,
+              padding: 3,
+              backgroundColor: '#FEA11F',
+              borderRadius: 100,
+              flexDirection: 'row',
+              alignItems: 'center',
             }}
-          />
-          <TextInput
-            style={styles.searchField}
-            keyboardType="email-address"
-            placeholder="Search..."
-            onChangeText={onChange}
-            value={searchText}
-          />
-        </View>
+            activeOpacity={0.6}
+            onPress={() => setOpenModal(true)}
+          >
+            <Icon
+              type="material-icons"
+              name="filter-list"
+              color="#fff"
+              style={{ marginHorizontal: 12 }}
+            />
+          </TouchableOpacity>
+        </>
       ),
     });
-  }, [navigation, searchText]);
+  }, [navigation, onChange, searchText]);
 
   return (
     <View style={globalStyles.screen}>
-      {foods.length >= 1 ? (
+      {searchRecipe.length > 0 ? (
         <FlatList
           persistentScrollbar
-          data={foods}
-          ListHeaderComponent={() => (
-            <View
-              style={{
-                height: 12,
-              }}
-            />
+          data={searchRecipe}
+          ListHeaderComponent={() => <View style={{ height: 12 }} />}
+          ListFooterComponent={() => <View style={{ height: 12 }} />}
+          renderItem={({ item }) => (
+            <FoodCardSearch recipe={item} navigation={navigation} route={route} />
           )}
-          ListFooterComponent={() => (
-            <View
-              style={{
-                height: 12,
-              }}
-            />
-          )}
-          renderItem={({ item }) => <FoodCard food={item} navigation={navigation} route={route} />}
         />
       ) : (
         <View style={styles.emptyContainer}>
@@ -128,18 +108,24 @@ export default function Search({ navigation, route }) {
             color="#bbb"
           />
           <View style={styles.emptyLabelContainer}>
-            <Text style={styles.emptyLabel}>No Search Results!</Text>
-            <Text style={styles.emptyLabelDetails}>Please search a food name or category!</Text>
+            <Text style={styles.emptyLabel}>Поиск не дал результатов!</Text>
           </View>
         </View>
       )}
+
+      <SearchModal
+        setSearchRecipe={setSearchRecipe}
+        ingredients={ingredients}
+        visible={openModal}
+        onClose={() => setOpenModal(false)}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   searchFieldContainer: {
-    width: window.width - 32,
+    width: window.width - 100,
     paddingVertical: 4,
     borderRadius: 100,
     flexDirection: 'row',

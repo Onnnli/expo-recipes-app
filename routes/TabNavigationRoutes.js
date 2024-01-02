@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon } from 'react-native-elements';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import DiscoverStack from './DiscoverStack';
+// import DiscoverStack from './DiscoverStack';
 import CategoriesStack from './CategoriesStack';
 import SearchStack from './SearchStack';
 import FavoritesStack from './FavoritesStack';
@@ -26,20 +26,10 @@ function TabNavigationRoutes() {
       }}
     >
       <Tab.Screen
-        name="DiscoverStack"
-        component={DiscoverStack}
-        options={{
-          title: 'Discover',
-          tabBarIcon: (props) => (
-            <Icon type="ionicon" name="fast-food-outline" color={props.color} />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="CategoriesStack"
         component={CategoriesStack}
         options={{
-          title: 'Categories',
+          title: 'Категории',
           tabBarIcon: (props) => (
             <Icon type="material-icons" name="restaurant" color={props.color} />
           ),
@@ -49,7 +39,7 @@ function TabNavigationRoutes() {
         name="SearchStack"
         component={SearchStack}
         options={{
-          title: 'Search',
+          title: 'Поиск',
           tabBarIcon: (props) => <Icon type="material-icons" name="search" color={props.color} />,
         }}
       />
@@ -57,7 +47,7 @@ function TabNavigationRoutes() {
         name="FavoritesStack"
         component={FavoritesStack}
         options={{
-          title: 'Favorites',
+          title: 'Избранное',
           tabBarIcon: (props) => (
             <Icon type="material-icons" name="favorite-outline" color={props.color} />
           ),

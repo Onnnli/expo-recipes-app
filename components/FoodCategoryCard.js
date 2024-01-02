@@ -1,29 +1,28 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import window from '../assets/controller/window';
+import baseURL from '../constants/baseUrl';
 
-export default function FoodCategoryCard({ navigation, route, category }) {
+export default function FoodCategoryCard({ navigation, category }) {
   return (
     <View style={styles.cardWrapper}>
       <TouchableOpacity
         activeOpacity={0.6}
-        style={[
-          styles.cardContainer,
-          {
-            backgroundColor: category.color != null ? category.color : '#FEA11F',
-          },
-        ]}
-        onPress={() => navigation.push('FoodCategory', category.name)}
+        style={styles.cardContainer}
+        onPress={() =>
+          navigation.push('FoodCategory', { name: category.name, id: category.id_category })
+        }
       >
         <View style={styles.cardLabelContainer}>
           <Text style={styles.cardCategoryName}>{category.name}</Text>
         </View>
+
         <View style={styles.cardDeco1} />
         <View style={styles.cardDeco2} />
+
         <View style={styles.cardImageContainer}>
           <Image
             style={styles.cardImage}
-            source={category.image ? category.image : require('../assets/images/no-image.png')}
+            source={{ uri: `${baseURL}/public/images/${category.slug}.png` }}
           />
         </View>
       </TouchableOpacity>
@@ -38,7 +37,7 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flexDirection: 'row',
-    backgroundColor: 'white',
+    backgroundColor: '#FEA11F',
     overflow: 'hidden',
     borderRadius: 8,
     elevation: 4,
